@@ -24,8 +24,8 @@ int jogadorId = 1;
 DHT dht(DHTPIN, dhttype);
 
 
-const char* ssid = "Wokwi-GUEST";    // Ajuste para sua rede Wi-Fi
-const char* password = "";           // Ajuste para sua senha de Wi-Fi
+const char* ssid = "GUEST";    
+const char* password = "";           
 const char* mqttServer = "test.mosquitto.org";
 const int mqttPort = 1883;
 const char* mqttClientId = "arduino-uno-futebol";
