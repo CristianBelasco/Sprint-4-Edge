@@ -4,7 +4,7 @@
 #include <ESP8266WiFi.h>  // Biblioteca para o ESP8266
 #include <PubSubClient.h>
 
-// --- Definições de hardware ---
+
 #define dhttype DHT22
 #define TRIG_PIN 13
 #define ECHO_PIN 12
@@ -13,7 +13,7 @@
 #define LED_AMARELO 7
 #define LED_VERMELHO 6
 
-// --- Variáveis do sistema ---
+
 long duracao;
 float distancia_cm;
 
@@ -23,7 +23,7 @@ int jogadorId = 1;
 
 DHT dht(DHTPIN, dhttype);
 
-// --- Config WiFi/MQTT ---
+
 const char* ssid = "Wokwi-GUEST";    // Ajuste para sua rede Wi-Fi
 const char* password = "";           // Ajuste para sua senha de Wi-Fi
 const char* mqttServer = "test.mosquitto.org";
@@ -33,7 +33,7 @@ const char* mqttClientId = "arduino-uno-futebol";
 WiFiClient wifiClient;
 PubSubClient mqttClient(wifiClient);
 
-// Callback para mensagens MQTT recebidas (ex: controle remoto dos LEDs)
+
 void mqttCallback(char* topic, byte* payload, unsigned int length) {
   Serial.print("Mensagem recebida em [");
   Serial.print(topic);
@@ -47,7 +47,7 @@ void mqttCallback(char* topic, byte* payload, unsigned int length) {
   if (payload[0] == '0') digitalWrite(LED_VERDE, LOW);
 }
 
-// Função de reconexão MQTT
+
 void reconnectMQTT() {
   while (!mqttClient.connected()) {
     Serial.print("Tentando conectar ao MQTT...");
@@ -78,7 +78,7 @@ void setup() {
   digitalWrite(LED_AMARELO, LOW);
   digitalWrite(LED_VERMELHO, LOW);
 
-  // Conexão WiFi
+  
   WiFi.begin(ssid, password);
   Serial.print("Conectando-se ao WiFi ");
   Serial.print(ssid);
@@ -90,7 +90,7 @@ void setup() {
   Serial.print("IP: ");
   Serial.println(WiFi.localIP());
 
-  // Conexão MQTT
+  
   mqttClient.setServer(mqttServer, mqttPort);
   mqttClient.setCallback(mqttCallback);
   reconnectMQTT();
@@ -102,7 +102,7 @@ void loop() {
   }
   mqttClient.loop();
 
-  // Sensor de distância
+  
   digitalWrite(TRIG_PIN, LOW);
   delayMicroseconds(2);
   digitalWrite(TRIG_PIN, HIGH);
@@ -141,14 +141,14 @@ void loop() {
   }
   estadoAnteriorPassagem = estadoAtualPassagem;
 
-  // --- Publicação MQTT separada por métrica ---
+  
   mqttClient.publish("futebol/passagens", String(contadorPasses).c_str());
   mqttClient.publish("futebol/jogador", String(jogadorId).c_str());
   mqttClient.publish("futebol/distancia", String(distancia_cm).c_str());
   mqttClient.publish("futebol/temperatura", String(isnan(temperatura) ? 0 : temperatura).c_str());
   mqttClient.publish("futebol/umidade", String(isnan(umidade) ? 0 : umidade).c_str());
 
-  // --- Serial Monitor organizado ---
+  
   Serial.print("Passagens: ");
   Serial.println(contadorPasses);
   Serial.print("Jogador: ");
