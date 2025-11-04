@@ -1,7 +1,7 @@
 #include <Arduino.h>
 #include <ArduinoJson.h>
 #include <DHT.h>
-#include <WiFi.h>
+#include <ESP8266WiFi.h>  // Biblioteca para o ESP8266
 #include <PubSubClient.h>
 
 // --- Definições de hardware ---
@@ -10,8 +10,8 @@
 #define ECHO_PIN 12
 #define DHTPIN 5
 #define LED_VERDE 8
-#define LED_AMARELO 36
-#define LED_VERMELHO 34
+#define LED_AMARELO 7
+#define LED_VERMELHO 6
 
 // --- Variáveis do sistema ---
 long duracao;
@@ -24,11 +24,11 @@ int jogadorId = 1;
 DHT dht(DHTPIN, dhttype);
 
 // --- Config WiFi/MQTT ---
-const char* ssid = "Wokwi-GUEST";
-const char* password = "";
+const char* ssid = "Wokwi-GUEST";    // Ajuste para sua rede Wi-Fi
+const char* password = "";           // Ajuste para sua senha de Wi-Fi
 const char* mqttServer = "test.mosquitto.org";
 const int mqttPort = 1883;
-const char* mqttClientId = "esp32-futebol";
+const char* mqttClientId = "arduino-uno-futebol";
 
 WiFiClient wifiClient;
 PubSubClient mqttClient(wifiClient);
@@ -53,7 +53,7 @@ void reconnectMQTT() {
     Serial.print("Tentando conectar ao MQTT...");
     if (mqttClient.connect(mqttClientId)) {
       Serial.println("Conectado!");
-      mqttClient.subscribe("led/control/samuel"); // tópico de controle
+      mqttClient.subscribe("led/control/samuel"); // Tópico de controle
     } else {
       Serial.print("Falha, rc=");
       Serial.print(mqttClient.state());
@@ -141,7 +141,7 @@ void loop() {
   }
   estadoAnteriorPassagem = estadoAtualPassagem;
 
-// --- Publicação MQTT separada por métrica ---
+  // --- Publicação MQTT separada por métrica ---
   mqttClient.publish("futebol/passagens", String(contadorPasses).c_str());
   mqttClient.publish("futebol/jogador", String(jogadorId).c_str());
   mqttClient.publish("futebol/distancia", String(distancia_cm).c_str());
