@@ -12,6 +12,8 @@
 
 # Node-red:
 <img width="800" height="407" alt="image" src="https://github.com/user-attachments/assets/2e00482b-b3a3-4d8d-84ce-9158500c86ea" />
+<img width="864" height="712" alt="image" src="https://github.com/user-attachments/assets/cdf19aed-4885-4fca-8b1b-85f93395d85c" />
+
 
 # DashBoard:
 <img width="214" height="728" alt="image" src="https://github.com/user-attachments/assets/afb975b1-80d2-4efa-b066-f2f393718091" />
