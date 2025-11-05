@@ -11,7 +11,8 @@
 <img width="1200" height="1600" alt="image" src="https://github.com/user-attachments/assets/d27855a8-f8ad-4d13-aaf4-3a050dbe09f4" />
 
 # Node-red:
-<img width="800" height="407" alt="image" src="https://github.com/user-attachments/assets/2e00482b-b3a3-4d8d-84ce-9158500c86ea" />
+<img width="591" height="380" alt="image" src="https://github.com/user-attachments/assets/609b2add-f092-4d29-9503-e0fa11c565ef" />
+
 <img width="864" height="712" alt="image" src="https://github.com/user-attachments/assets/cdf19aed-4885-4fca-8b1b-85f93395d85c" />
 
 # DashBoard:
