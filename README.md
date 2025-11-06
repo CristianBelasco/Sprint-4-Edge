@@ -1,7 +1,6 @@
-# Sprint-4-Edge
+# Sprint-4-Edge Contador de Passes 
 
-# Projeto IoT com MQTT – Contador de Passes (Arduino UNO + Ethernet Shield)
-📖 Descrição
+# Descrição:
 
 Este projeto demonstra uma aplicação de Internet das Coisas (IoT) utilizando o Arduino UNO e um Ethernet Shield (pode ser W5100 ou W5500).
 O sistema coleta dados de temperatura, umidade e distância, contabiliza passagens detectadas e publica essas informações em tópicos MQTT.
