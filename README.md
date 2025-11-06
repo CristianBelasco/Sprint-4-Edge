@@ -1,13 +1,13 @@
 # Sprint-4-Edge
 
-#Projeto IoT com MQTT – Contador de Passes (Arduino UNO + Ethernet Shield)
+# Projeto IoT com MQTT – Contador de Passes (Arduino UNO + Ethernet Shield)
 📖 Descrição
 
 Este projeto demonstra uma aplicação de Internet das Coisas (IoT) utilizando o Arduino UNO e um Ethernet Shield (pode ser W5100 ou W5500).
 O sistema coleta dados de temperatura, umidade e distância, contabiliza passagens detectadas e publica essas informações em tópicos MQTT.
 Além disso, permite o controle remoto de LEDs através de mensagens MQTT recebidas.
 
-#Funcionalidades
+# Funcionalidades
 
 Comunicação via rede Ethernet com broker MQTT público;
 
@@ -34,7 +34,7 @@ Broker MQTT: test.mosquitto.org (porta 1883)
 Conecte o cabo de rede ao Shield e alimente o Arduino normalmente.
 Caso o DHCP venha a falhar, o código usa um IP fixo configurado manualmente.
 
-#Comunicação MQTT
+# Comunicação MQTT
 
 Broker: test.mosquitto.org
 Porta: 1883
@@ -53,7 +53,7 @@ led/control/samuel	Controle do LED verde remoto	"1" liga / "0" desliga
 
 Para visualizar em tempo real, conectar-se ao Node-red.
 
-#Lógica dos LEDs:
+# Lógica dos LEDs:
 Situação	LED Ativo	Significado
 Passes < 5	Verde	Normal
 5–9	Amarelo	Atenção
