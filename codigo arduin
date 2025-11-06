@@ -1,9 +1,9 @@
 #include <Arduino.h>
 #include <ArduinoJson.h>
 #include <DHT.h>
-#include <ESP8266WiFi.h> 
+#include <SPI.h>
+#include <Ethernet.h>       
 #include <PubSubClient.h>
-
 
 #define dhttype DHT22
 #define TRIG_PIN 13
@@ -12,7 +12,6 @@
 #define LED_VERDE 8
 #define LED_AMARELO 7
 #define LED_VERMELHO 6
-
 
 long duracao;
 float distancia_cm;
@@ -24,27 +23,27 @@ int jogadorId = 1;
 DHT dht(DHTPIN, dhttype);
 
 
-const char* ssid = "GUEST";    
-const char* password = "";           
+byte mac[] = { 0xDE, 0xAD, 0xBE, 0xEF, 0xFE, 0xED };  // endereço MAC genérico
+IPAddress ip(192, 168, 1, 177);                      // IP fixo opcional (ajuste conforme sua rede)
 const char* mqttServer = "test.mosquitto.org";
 const int mqttPort = 1883;
-const char* mqttClientId = "arduino-uno-futebol";
+const char* mqttClientId = "arduino-uno-ethernet";
 
-WiFiClient wifiClient;
-PubSubClient mqttClient(wifiClient);
+EthernetClient ethClient;
+PubSubClient mqttClient(ethClient);
 
 
 void mqttCallback(char* topic, byte* payload, unsigned int length) {
   Serial.print("Mensagem recebida em [");
   Serial.print(topic);
   Serial.print("]: ");
-  for (unsigned int i = 0; i < length; i++) {
-    Serial.print((char)payload[i]);
-  }
+  for (unsigned int i = 0; i < length; i++) Serial.print((char)payload[i]);
   Serial.println();
 
-  if (payload[0] == '1') digitalWrite(LED_VERDE, HIGH);
-  if (payload[0] == '0') digitalWrite(LED_VERDE, LOW);
+  if (length > 0) {
+    if (payload[0] == '1') digitalWrite(LED_VERDE, HIGH);
+    if (payload[0] == '0') digitalWrite(LED_VERDE, LOW);
+  }
 }
 
 
@@ -53,7 +52,7 @@ void reconnectMQTT() {
     Serial.print("Tentando conectar ao MQTT...");
     if (mqttClient.connect(mqttClientId)) {
       Serial.println("Conectado!");
-      mqttClient.subscribe("led/control/samuel"); // Tópico de controle
+      mqttClient.subscribe("led/control/samuel");
     } else {
       Serial.print("Falha, rc=");
       Serial.print(mqttClient.state());
@@ -69,7 +68,6 @@ void setup() {
 
   pinMode(TRIG_PIN, OUTPUT);
   pinMode(ECHO_PIN, INPUT);
-
   pinMode(LED_VERDE, OUTPUT);
   pinMode(LED_AMARELO, OUTPUT);
   pinMode(LED_VERMELHO, OUTPUT);
@@ -79,30 +77,26 @@ void setup() {
   digitalWrite(LED_VERMELHO, LOW);
 
   
-  WiFi.begin(ssid, password);
-  Serial.print("Conectando-se ao WiFi ");
-  Serial.print(ssid);
-  while (WiFi.status() != WL_CONNECTED) {
-    delay(500);
-    Serial.print(".");
+  Serial.println("Inicializando Ethernet...");
+  if (Ethernet.begin(mac) == 0) {
+    Serial.println("Falha ao obter IP via DHCP. Usando IP fixo.");
+    Ethernet.begin(mac, ip);
   }
-  Serial.println("\nWiFi conectado!");
-  Serial.print("IP: ");
-  Serial.println(WiFi.localIP());
+  delay(2000);
+  Serial.print("IP Local: ");
+  Serial.println(Ethernet.localIP());
 
-  
+  // --- MQTT ---
   mqttClient.setServer(mqttServer, mqttPort);
   mqttClient.setCallback(mqttCallback);
   reconnectMQTT();
 }
 
 void loop() {
-  if (!mqttClient.connected()) {
-    reconnectMQTT();
-  }
+  if (!mqttClient.connected()) reconnectMQTT();
   mqttClient.loop();
 
-  
+  // ultrassônico
   digitalWrite(TRIG_PIN, LOW);
   delayMicroseconds(2);
   digitalWrite(TRIG_PIN, HIGH);
@@ -110,13 +104,13 @@ void loop() {
   digitalWrite(TRIG_PIN, LOW);
 
   duracao = pulseIn(ECHO_PIN, HIGH);
-  distancia_cm = duracao * 0.0343 / 2;
+  distancia_cm = duracao * 0.0343 / 2.0;
 
   // DHT
   float temperatura = dht.readTemperature();
   float umidade = dht.readHumidity();
 
-  // Detecta passagem
+  // Detecção de passagem
   int estadoAtualPassagem = (distancia_cm < 20) ? 1 : 0;
 
   if (estadoAtualPassagem == 1 && estadoAnteriorPassagem == 0) {
@@ -141,24 +135,19 @@ void loop() {
   }
   estadoAnteriorPassagem = estadoAtualPassagem;
 
-  
-  mqttClient.publish("futebol/passagens", String(contadorPasses).c_str());
-  mqttClient.publish("futebol/jogador", String(jogadorId).c_str());
-  mqttClient.publish("futebol/distancia", String(distancia_cm).c_str());
+  // --- Publicação do MQTT ---
+  mqttClient.publish("futebol/passagens",   String(contadorPasses).c_str());
+  mqttClient.publish("futebol/jogador",     String(jogadorId).c_str());
+  mqttClient.publish("futebol/distancia",   String(distancia_cm).c_str());
   mqttClient.publish("futebol/temperatura", String(isnan(temperatura) ? 0 : temperatura).c_str());
-  mqttClient.publish("futebol/umidade", String(isnan(umidade) ? 0 : umidade).c_str());
+  mqttClient.publish("futebol/umidade",     String(isnan(umidade) ? 0 : umidade).c_str());
 
-  
-  Serial.print("Passagens: ");
-  Serial.println(contadorPasses);
-  Serial.print("Jogador: ");
-  Serial.println(jogadorId);
-  Serial.print("Distancia (cm): ");
-  Serial.println(distancia_cm);
-  Serial.print("Temperatura (°C): ");
-  Serial.println(isnan(temperatura) ? 0 : temperatura);
-  Serial.print("Umidade (%): ");
-  Serial.println(isnan(umidade) ? 0 : umidade);
+  // --- Serial Monitor ---
+  Serial.print("Passagens: ");   Serial.println(contadorPasses);
+  Serial.print("Jogador: ");     Serial.println(jogadorId);
+  Serial.print("Distancia: ");   Serial.println(distancia_cm);
+  Serial.print("Temperatura: "); Serial.println(isnan(temperatura) ? 0 : temperatura);
+  Serial.print("Umidade: ");     Serial.println(isnan(umidade) ? 0 : umidade);
   Serial.println("--------------------");
 
   delay(500);
