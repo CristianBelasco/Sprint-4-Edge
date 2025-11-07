@@ -24,7 +24,7 @@ DHT dht(DHTPIN, dhttype);
 
 
 byte mac[] = { 0xDE, 0xAD, 0xBE, 0xEF, 0xFE, 0xED };  // endereço MAC genérico
-IPAddress ip(192, 168, 1, 177);                      // IP fixo opcional (ajuste conforme sua rede)
+IPAddress ip(192, 168, 1, 177);                      // é um IP fixo opcional (ajuste ele conforme sua rede)
 const char* mqttServer = "test.mosquitto.org";
 const int mqttPort = 1883;
 const char* mqttClientId = "arduino-uno-ethernet";
