@@ -76,7 +76,7 @@ Monitore os tópicos no dashboard MQTT.
 - Cristian Belasco Arancibia - RM565710.
 - João Lucas Ferreira dos Santos - RM562608.
 - Felipe Yamaguchi Mesquita - RM556170.
-- Samuel de Oliveira da Silva - RM566245.
+- Samuel de Oliveira da Silva - RM566244.
 - Rafael Felix - RM565855.
 
 # Arduino uno:
